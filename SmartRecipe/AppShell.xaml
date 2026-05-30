@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:SmartRecipe.Views"
+       x:Class="SmartRecipe.AppShell"
+       Shell.FlyoutBehavior="Disabled"
+       Shell.NavBarIsVisible="True">
+
+    <!-- Accessibility: Set proper titles and icons for screen readers -->
+    <TabBar>
+        <ShellContent Title="Recipes"
+                      Icon="icon_recipes.png"
+                      ContentTemplate="{DataTemplate views:RecipesPage}"
+                      AutomationProperties.Name="Browse Recipes"
+                      AutomationProperties.HelpText="View and search all available recipes"/>
+
+        <ShellContent Title="Scan"
+                      Icon="icon_scan.png"
+                      ContentTemplate="{DataTemplate views:ScanPage}"
+                      AutomationProperties.Name="Scan Ingredients"
+                      AutomationProperties.HelpText="Use camera to scan food ingredients"/>
+
+        <ShellContent Title="Local"
+                      Icon="icon_location.png"
+                      ContentTemplate="{DataTemplate views:LocalCuisinePage}"
+                      AutomationProperties.Name="Local Cuisine"
+                      AutomationProperties.HelpText="Discover recipes based on your location"/>
+
+        <ShellContent Title="Favorites"
+                      Icon="icon_favorites.png"
+                      ContentTemplate="{DataTemplate views:FavoritesPage}"
+                      AutomationProperties.Name="Favorite Recipes"
+                      AutomationProperties.HelpText="View your saved favorite recipes"/>
+    </TabBar>
+
+</Shell>

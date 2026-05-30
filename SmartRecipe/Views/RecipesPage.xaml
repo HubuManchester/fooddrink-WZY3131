@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:SmartRecipe.Models"
+             x:Class="SmartRecipe.Views.RecipesPage"
+             Title="Smart Recipes">
+
+    <Grid RowDefinitions="Auto,*" Padding="16">
+
+        <!-- Search Bar -->
+        <SearchBar Grid.Row="0"
+                   Placeholder="Search recipes..."
+                   x:Name="RecipeSearchBar"
+                   SearchButtonPressed="OnSearchButtonPressed"
+                   Margin="0,0,0,8"/>
+
+        <!-- Recipe Collection -->
+        <CollectionView Grid.Row="1"
+                        x:Name="RecipeCollectionView"
+                        SelectionMode="Single"
+                        SelectionChanged="OnRecipeSelected"
+                        RemainingItemsThreshold="5"
+                        RemainingItemsThresholdReached="OnLoadMoreItems">
+
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical"
+                                 Span="2"
+                                 HorizontalItemSpacing="8"
+                                 VerticalItemSpacing="8"/>
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Recipe">
+                    <Frame BackgroundColor="White"
+                           CornerRadius="8"
+                           Padding="16"
+                           HasShadow="True"
+                           BorderColor="Transparent"
+                           Margin="0">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRecipeCardTapped"
+                                                  CommandParameter="{Binding .}"/>
+                        </Frame.GestureRecognizers>
+                        <StackLayout Spacing="8">
+                            <Label Text="{Binding Name}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   MaxLines="2"
+                                   LineBreakMode="TailTruncation"/>
+
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Label Grid.Column="0" 
+                                       Text="{Binding CookingTimeMinutes, StringFormat='{0} min'}"
+                                       FontSize="14"
+                                       TextColor="Gray"/>
+                                <Label Grid.Column="2" 
+                                       Text="{Binding Difficulty}"
+                                       FontSize="14"
+                                       TextColor="Gray"/>
+                            </Grid>
+
+                            <Label Text="{Binding Rating, StringFormat='★ {0:F1}'}"
+                                   TextColor="#FF6B35"
+                                   FontSize="12"/>
+                        </StackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <!-- Empty State -->
+            <CollectionView.EmptyView>
+                <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="16">
+                    <Label Text="🍳" FontSize="48" HorizontalOptions="Center"/>
+                    <Label Text="No recipes found" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center"/>
+                    <Label Text="Try searching with different keywords" FontSize="16" HorizontalOptions="Center"/>
+                </StackLayout>
+            </CollectionView.EmptyView>
+
+        </CollectionView>
+    </Grid>
+
+</ContentPage>
