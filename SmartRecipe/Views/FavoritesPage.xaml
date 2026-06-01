@@ -1,18 +1,56 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:SmartRecipe.ViewModels"
+             xmlns:models="clr-namespace:SmartRecipe.Models"
              x:Class="SmartRecipe.Views.FavoritesPage"
-             Title="Favorites">
-    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" 
-                         Spacing="{StaticResource SpacingLarge}">
-        <Label Text="❤️"
-               FontSize="64"
-               HorizontalOptions="Center"/>
-        <Label Text="Your Favorites"
-               Style="{StaticResource HeadingLabel}"
-               HorizontalOptions="Center"/>
-        <Label Text="Save your favorite recipes here..."
-               Style="{StaticResource BodyLabel}"
-               HorizontalOptions="Center"/>
-    </VerticalStackLayout>
+             Title="Favorites"
+             x:DataType="viewmodels:FavoritesViewModel">
+
+    <Grid RowDefinitions="*" Padding="{StaticResource SpacingMedium}">
+
+        <CollectionView ItemsSource="{Binding FavoriteRecipes}"
+                        SelectionMode="Single"
+                        SelectionChanged="OnRecipeSelected">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Recipe"
+                             xmlns:models="clr-namespace:SmartRecipe.Models">
+                    <Frame Style="{StaticResource CardFrame}" Margin="0,4">
+                        <Grid ColumnDefinitions="80,*,Auto" 
+                              ColumnSpacing="{StaticResource SpacingMedium}">
+                            <Frame Grid.Column="0" Padding="0" CornerRadius="8" 
+                                   HeightRequest="80" WidthRequest="80">
+                                <Image Source="{Binding ImageUrl}" Aspect="AspectFill"/>
+                            </Frame>
+                            <StackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                <Label Text="{Binding CuisineType}" 
+                                       Style="{StaticResource BodyLabel}"/>
+                                <Label Text="{Binding CookingTimeMinutes, StringFormat='{0} min'}" 
+                                       Style="{StaticResource BodyLabel}"/>
+                            </StackLayout>
+                            <Button Grid.Column="2" Text="❤️"
+                                    BackgroundColor="Transparent"
+                                    CommandParameter="{Binding .}"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.EmptyView>
+                <StackLayout VerticalOptions="Center" HorizontalOptions="Center" 
+                             Spacing="{StaticResource SpacingMedium}">
+                    <Label Text="❤️" FontSize="64" HorizontalOptions="Center"/>
+                    <Label Text="No Favorites Yet"
+                           Style="{StaticResource HeadingLabel}"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Browse recipes and tap the heart icon to save them here"
+                           Style="{StaticResource BodyLabel}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"/>
+                </StackLayout>
+            </CollectionView.EmptyView>
+        </CollectionView>
+    </Grid>
 </ContentPage>

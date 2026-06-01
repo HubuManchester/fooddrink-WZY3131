@@ -1,54 +1,51 @@
 using SmartRecipe.Models;
-using SmartRecipe.ViewModels;  
+using SmartRecipe.ViewModels;
 
-namespace SmartRecipe.Views;
-
-public partial class RecipesPage : ContentPage
+namespace SmartRecipe.Views
 {
-    private readonly RecipesViewModel _viewModel;
-
-    public RecipesPage()
+    public partial class RecipesPage : ContentPage
     {
-        InitializeComponent();
-        _viewModel = new RecipesViewModel();
-        BindingContext = _viewModel;
-    }
+        private readonly RecipesViewModel _viewModel;
 
-    private async void OnRecipeSelected(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.CurrentSelection.FirstOrDefault() is Recipe selectedRecipe)
+        public RecipesPage()
         {
-            HapticFeedback.Default.Perform(HapticFeedbackType.Click);
-            ((CollectionView)sender).SelectedItem = null;
-
-            
-            await Shell.Current.DisplayAlert(
-                "Recipe Selected",
-                $"You selected: {selectedRecipe.Name}",
-                "OK");
+            //InitializeComponent();
+            _viewModel = new RecipesViewModel();
+            BindingContext = _viewModel;
         }
-    }
 
-    private void OnRecipeCardTapped(object sender, TappedEventArgs e)
-    {
-        if (e.Parameter is Recipe recipe)
+        private async void OnRecipeSelected(object sender, SelectionChangedEventArgs e)
         {
-            HapticFeedback.Default.Perform(HapticFeedbackType.Click);
-            Shell.Current.DisplayAlert(
-                "Recipe Tapped",
-                $"You tapped: {recipe.Name}",
-                "OK");
+            if (e.CurrentSelection.FirstOrDefault() is Recipe selectedRecipe)
+            {
+                HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+                ((CollectionView)sender).SelectedItem = null;
+
+                
+                await Shell.Current.GoToAsync($"{nameof(RecipeDetailPage)}?recipeId={selectedRecipe.Id}");
+            }
         }
-    }
 
-    private void OnLoadMoreItems(object sender, EventArgs e)
-    {
-        _viewModel.LoadMoreRecipes();
-    }
+        private async void OnRecipeCardTapped(object sender, TappedEventArgs e)
+        {
+            if (e.Parameter is Recipe recipe)
+            {
+                HapticFeedback.Default.Perform(HapticFeedbackType.Click);
 
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
-        _viewModel.RefreshRecipes();
+                
+                await Shell.Current.GoToAsync($"{nameof(RecipeDetailPage)}?recipeId={recipe.Id}");
+            }
+        }
+
+        private void OnLoadMoreItems(object sender, EventArgs e)
+        {
+            _viewModel.LoadMoreRecipes();
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            _viewModel.RefreshRecipes();
+        }
     }
 }

@@ -1,18 +1,120 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:SmartRecipe.ViewModels"
+             xmlns:models="clr-namespace:SmartRecipe.Models"
              x:Class="SmartRecipe.Views.ScanPage"
-             Title="Scan Ingredients">
-    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" 
-                         Spacing="{StaticResource SpacingLarge}">
-        <Label Text="📷"
-               FontSize="64"
-               HorizontalOptions="Center"/>
-        <Label Text="Camera Scan"
-               Style="{StaticResource HeadingLabel}"
-               HorizontalOptions="Center"/>
-        <Label Text="Scan ingredients coming soon..."
-               Style="{StaticResource BodyLabel}"
-               HorizontalOptions="Center"/>
-    </VerticalStackLayout>
+             Title="Scan Ingredients"
+             x:DataType="viewmodels:ScanViewModel">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="{StaticResource SpacingMedium}">
+
+        <!-- Header -->
+        <Frame Grid.Row="0" Style="{StaticResource CardFrame}" Margin="0,0,0,16">
+            <StackLayout Spacing="{StaticResource SpacingSmall}">
+                <Label Text="Scan Your Ingredients"
+                       Style="{StaticResource HeadingLabel}"/>
+                <Label Text="Take a photo of your ingredients or scan product barcodes to find matching recipes"
+                       Style="{StaticResource BodyLabel}"/>
+            </StackLayout>
+        </Frame>
+
+        <!-- Camera Preview / Scanned Items -->
+        <ScrollView Grid.Row="1">
+            <StackLayout Spacing="{StaticResource SpacingMedium}">
+
+                <!-- Camera Capture Button -->
+                <Frame Style="{StaticResource CardFrame}" 
+                       BorderColor="{StaticResource PrimaryColor}" Padding="0" HeightRequest="200">
+                    <Grid>
+                        <Image Source="{Binding CapturedImagePath}" 
+                               Aspect="AspectFill"
+                               AutomationProperties.Name="Captured ingredient image"/>
+                        <Button Text="📷 Capture Ingredients"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding CaptureCommand}"
+                                IsEnabled="{Binding IsNotScanning}"
+                                VerticalOptions="End"
+                                Margin="16"/>
+                        <ActivityIndicator IsRunning="{Binding IsScanning}"
+                                           IsVisible="{Binding IsScanning}"
+                                           Color="{StaticResource PrimaryColor}"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Detected Ingredients -->
+                <Frame Style="{StaticResource CardFrame}" 
+                       IsVisible="{Binding HasDetectedIngredients}">
+                    <StackLayout Spacing="{StaticResource SpacingSmall}">
+                        <Label Text="Detected Ingredients"
+                               Style="{StaticResource HeadingLabel}"/>
+
+                        <CollectionView ItemsSource="{Binding DetectedIngredients}"
+                                        SelectionMode="None">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="4"/>
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:Ingredient"
+                                             xmlns:models="clr-namespace:SmartRecipe.Models">
+                                    <Frame BackgroundColor="{StaticResource BackgroundColor}"
+                                           CornerRadius="{StaticResource CornerRadiusSmall}"
+                                           Padding="12,8">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <Label Grid.Column="0" Text="🥘" FontSize="20"/>
+                                            <StackLayout Grid.Column="1" Margin="8,0,0,0">
+                                                <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                                <Label Text="{Binding Category}" 
+                                                       Style="{StaticResource BodyLabel}"/>
+                                            </StackLayout>
+                                            <Label Grid.Column="2" 
+                                                   Text="{Binding ScannedAt, StringFormat='{0:HH:mm}'}"
+                                                   Style="{StaticResource BodyLabel}"
+                                                   VerticalOptions="Center"/>
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <Button Text="Find Recipes with These Ingredients"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding FindRecipesCommand}"/>
+                    </StackLayout>
+                </Frame>
+
+                <!-- Empty State -->
+                <Frame Style="{StaticResource CardFrame}" 
+                       IsVisible="{Binding ShowEmptyState}">
+                    <StackLayout HorizontalOptions="Center" VerticalOptions="Center" 
+                                 Spacing="{StaticResource SpacingMedium}" Padding="20">
+                        <Label Text="📸" FontSize="48" HorizontalOptions="Center"/>
+                        <Label Text="No Ingredients Scanned"
+                               Style="{StaticResource HeadingLabel}"
+                               HorizontalOptions="Center"/>
+                        <Label Text="Tap the capture button above to start scanning"
+                               Style="{StaticResource BodyLabel}"
+                               HorizontalOptions="Center"/>
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+        </ScrollView>
+
+        <!-- Error Message -->
+        <Frame Grid.Row="2" 
+               BackgroundColor="{StaticResource ErrorColor}"
+               IsVisible="{Binding HasError}"
+               CornerRadius="{StaticResource CornerRadiusMedium}"
+               Padding="{StaticResource SpacingSmall}">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Grid.Column="0" Text="{Binding ErrorMessage}" 
+                       TextColor="White"/>
+                <Button Grid.Column="1" Text="Dismiss"
+                        TextColor="White" BackgroundColor="Transparent"
+                        Command="{Binding DismissErrorCommand}"/>
+            </Grid>
+        </Frame>
+    </Grid>
 </ContentPage>

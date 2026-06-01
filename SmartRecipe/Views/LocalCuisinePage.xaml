@@ -1,18 +1,77 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:SmartRecipe.ViewModels"
+             xmlns:models="clr-namespace:SmartRecipe.Models"
              x:Class="SmartRecipe.Views.LocalCuisinePage"
-             Title="Local Cuisine">
-    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" 
-                         Spacing="{StaticResource SpacingLarge}">
-        <Label Text="📍"
-               FontSize="64"
-               HorizontalOptions="Center"/>
-        <Label Text="Location-Based Recipes"
-               Style="{StaticResource HeadingLabel}"
-               HorizontalOptions="Center"/>
-        <Label Text="Discover local dishes based on your location..."
-               Style="{StaticResource BodyLabel}"
-               HorizontalOptions="Center"/>
-    </VerticalStackLayout>
+             Title="Local Cuisine"
+             x:DataType="viewmodels:LocalCuisineViewModel">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="{StaticResource SpacingMedium}">
+
+        <!-- Location Info -->
+        <Frame Grid.Row="0" Style="{StaticResource CardFrame}" Margin="0,0,0,16">
+            <StackLayout Spacing="{StaticResource SpacingSmall}">
+                <Grid ColumnDefinitions="Auto,*">
+                    <Label Grid.Column="0" Text="📍" FontSize="24" VerticalOptions="Center"/>
+                    <Label Grid.Column="1" Text="{Binding CurrentLocation}" 
+                           Style="{StaticResource HeadingLabel}" VerticalOptions="Center"/>
+                </Grid>
+                <Label Text="{Binding LocationSubtitle}" Style="{StaticResource BodyLabel}"/>
+                <Button Text="Refresh Location"
+                        Style="{StaticResource PrimaryButton}"
+                        Command="{Binding RefreshLocationCommand}"
+                        IsEnabled="{Binding IsNotLoading}"/>
+            </StackLayout>
+        </Frame>
+
+        <!-- Loading -->
+        <ActivityIndicator Grid.Row="1" 
+                           IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           Color="{StaticResource PrimaryColor}"
+                           VerticalOptions="Center"/>
+
+        <!-- Local Recipes -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding LocalRecipes}"
+                        IsVisible="{Binding HasRecipes}"
+                        SelectionMode="Single"
+                        SelectionChanged="OnRecipeSelected">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Recipe"
+                             xmlns:models="clr-namespace:SmartRecipe.Models">
+                    <Frame Style="{StaticResource CardFrame}" Margin="0,4">
+                        <Grid ColumnDefinitions="80,*" ColumnSpacing="{StaticResource SpacingMedium}">
+                            <Frame Grid.Column="0" Padding="0" CornerRadius="8" 
+                                   HeightRequest="80" WidthRequest="80">
+                                <Image Source="{Binding ImageUrl}" Aspect="AspectFill"/>
+                            </Frame>
+                            <StackLayout Grid.Column="1" VerticalOptions="Center" 
+                                         Spacing="4">
+                                <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                <Label Text="{Binding CuisineType}" 
+                                       Style="{StaticResource BodyLabel}"/>
+                                <Label Text="{Binding CookingTimeMinutes, StringFormat='{0} min'}" 
+                                       Style="{StaticResource BodyLabel}"/>
+                            </StackLayout>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Error State -->
+        <Frame Grid.Row="2" 
+               BackgroundColor="{StaticResource ErrorColor}"
+               IsVisible="{Binding HasError}"
+               CornerRadius="{StaticResource CornerRadiusMedium}">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Grid.Column="0" Text="{Binding ErrorMessage}" TextColor="White"/>
+                <Button Grid.Column="1" Text="Retry" TextColor="White" 
+                        BackgroundColor="Transparent"
+                        Command="{Binding RefreshLocationCommand}"/>
+            </Grid>
+        </Frame>
+    </Grid>
 </ContentPage>

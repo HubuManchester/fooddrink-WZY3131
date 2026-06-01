@@ -1,9 +1,22 @@
-namespace SmartRecipe.Views;
+using SmartRecipe.ViewModels;
 
-public partial class LocalCuisinePage : ContentPage
+namespace SmartRecipe.Views
 {
-    public LocalCuisinePage()
+    public partial class LocalCuisinePage : ContentPage
     {
-        InitializeComponent();
+        public LocalCuisinePage()
+        {
+            InitializeComponent();
+        }
+
+        
+        private async void OnRecipeSelected(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.CurrentSelection.FirstOrDefault() is Models.Recipe selectedRecipe)
+            {
+                ((CollectionView)sender).SelectedItem = null;
+                await DisplayAlert("Recipe Selected", $"You selected: {selectedRecipe.Name}", "OK");
+            }
+        }
     }
 }

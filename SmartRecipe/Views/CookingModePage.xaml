@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:SmartRecipe.ViewModels"
+             x:Class="SmartRecipe.Views.CookingModePage"
+             Title="Cooking Mode"
+             x:DataType="viewmodels:CookingModeViewModel">
+
+    <Grid RowDefinitions="*,Auto" Padding="{StaticResource SpacingMedium}">
+
+        <!-- Step Display -->
+        <ScrollView Grid.Row="0">
+            <StackLayout Spacing="{StaticResource SpacingLarge}" VerticalOptions="Center">
+
+                <!-- Progress Indicator -->
+                <Label HorizontalOptions="Center"
+                       Style="{StaticResource BodyLabel}">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Step "/>
+                            <Span Text="{Binding CurrentStepNumber}" FontAttributes="Bold"/>
+                            <Span Text=" of "/>
+                            <Span Text="{Binding TotalSteps}" FontAttributes="Bold"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+
+                <!-- Current Step Card -->
+                <Frame Style="{StaticResource CardFrame}" 
+                       MinimumHeightRequest="200">
+                    <StackLayout VerticalOptions="Center" Spacing="{StaticResource SpacingMedium}">
+                        <Label Text="{Binding CurrentInstruction}"
+                               Style="{StaticResource HeadingLabel}"
+                               HorizontalTextAlignment="Center"/>
+
+                        <!-- Step Indicator Dots -->
+                        <FlexLayout JustifyContent="Center" Wrap="Wrap"
+                                    BindableLayout.ItemsSource="{Binding StepIndicators}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="x:Boolean">
+                                    <Frame HeightRequest="12" WidthRequest="12" 
+                                           CornerRadius="6" Margin="4"
+                                           BackgroundColor="{Binding .}"/>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </FlexLayout>
+                    </StackLayout>
+                </Frame>
+
+                <!-- Timer Display (if active) -->
+                <Frame Style="{StaticResource CardFrame}"
+                       IsVisible="{Binding IsTimerRunning}">
+                    <StackLayout HorizontalOptions="Center" Spacing="8">
+                        <Label Text="⏱ Timer" Style="{StaticResource HeadingLabel}" 
+                               HorizontalOptions="Center"/>
+                        <Label Text="{Binding TimerDisplay}" FontSize="36" 
+                               FontAttributes="Bold" HorizontalOptions="Center"
+                               TextColor="{StaticResource PrimaryColor}"/>
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+        </ScrollView>
+
+        <!-- Navigation Controls -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto,*" 
+              ColumnSpacing="{StaticResource SpacingSmall}" Padding="0,16">
+
+            <Button Grid.Column="0" Text="◀ Previous"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding PreviousStepCommand}"
+                    IsEnabled="{Binding CanGoPrevious}"/>
+
+            <Button Grid.Column="1" Text="🔊"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding ReadStepCommand}"
+                    WidthRequest="56"/>
+
+            <Button Grid.Column="2" Text="⏱"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding StartTimerCommand}"
+                    WidthRequest="56"/>
+
+            <Button Grid.Column="3" Text="Next ▶"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding NextStepCommand}"
+                    IsEnabled="{Binding CanGoNext}"/>
+        </Grid>
+    </Grid>
+</ContentPage>

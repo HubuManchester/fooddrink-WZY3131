@@ -1,76 +1,98 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:SmartRecipe.ViewModels"
              x:Class="SmartRecipe.Views.RecipeDetailPage"
-             Title="Recipe Details">
+             Title="Recipe Details"
+             x:DataType="viewmodels:RecipeDetailViewModel">
+
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="*,Auto" Padding="0,0,8,0">
+            <Label Grid.Column="0" Text="Recipe Details"
+                   Style="{StaticResource HeadingLabel}"
+                   VerticalOptions="Center"/>
+            <ImageButton Grid.Column="1"
+                         Source="icon_favorite.png"
+                         Command="{Binding ToggleFavoriteCommand}"
+                         HeightRequest="32" WidthRequest="32"
+                         AutomationProperties.Name="Toggle Favorite"
+                         AutomationProperties.HelpText="Add or remove this recipe from favorites"/>
+        </Grid>
+    </Shell.TitleView>
 
     <ScrollView>
-        <StackLayout Spacing="16" Padding="16">
+        <StackLayout Spacing="{StaticResource SpacingMedium}" 
+                     Padding="{StaticResource SpacingMedium}">
 
             <!-- Recipe Image -->
             <Frame Style="{StaticResource CardFrame}" Padding="0" HeightRequest="250">
-                <Image Source="{Binding ImageUrl}"
-                       Aspect="AspectFill"/>
+                <Image Source="{Binding Recipe.ImageUrl}"
+                       Aspect="AspectFill"
+                       AutomationProperties.Name="{Binding Recipe.Name, StringFormat='Image of {0}'}"/>
             </Frame>
 
             <!-- Recipe Name and Rating -->
             <Grid ColumnDefinitions="*,Auto">
-                <Label Grid.Column="0" Text="{Binding Name}"
+                <Label Grid.Column="0" Text="{Binding Recipe.Name}"
                        Style="{StaticResource HeadingLabel}"/>
                 <Frame Grid.Column="1" BackgroundColor="{StaticResource PrimaryColor}" 
-                       CornerRadius="16" Padding="8,4">
-                    <Label Text="{Binding Rating, StringFormat='★ {0:F1}'}"
+                       CornerRadius="{StaticResource CornerRadiusLarge}" Padding="8,4">
+                    <Label Text="{Binding Recipe.Rating, StringFormat='★ {0:F1}'}"
                            TextColor="White" FontAttributes="Bold"/>
                 </Frame>
             </Grid>
 
             <!-- Cooking Info Cards -->
-            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="{StaticResource SpacingSmall}">
                 <Frame Grid.Column="0" Style="{StaticResource CardFrame}">
                     <StackLayout HorizontalOptions="Center" Spacing="4">
                         <Label Text="⏱" FontSize="24" HorizontalOptions="Center"/>
-                        <Label Text="{Binding CookingTimeMinutes, StringFormat='{0} min'}" 
+                        <Label Text="{Binding Recipe.CookingTimeMinutes, StringFormat='{0} min'}" 
                                FontAttributes="Bold" HorizontalOptions="Center"/>
-                        <Label Text="Cook Time" Style="{StaticResource BodyLabel}" HorizontalOptions="Center"/>
+                        <Label Text="Cook Time" Style="{StaticResource BodyLabel}" 
+                               HorizontalOptions="Center"/>
                     </StackLayout>
                 </Frame>
 
                 <Frame Grid.Column="1" Style="{StaticResource CardFrame}">
                     <StackLayout HorizontalOptions="Center" Spacing="4">
                         <Label Text="📊" FontSize="24" HorizontalOptions="Center"/>
-                        <Label Text="{Binding Difficulty}" 
+                        <Label Text="{Binding Recipe.Difficulty}" 
                                FontAttributes="Bold" HorizontalOptions="Center"/>
-                        <Label Text="Difficulty" Style="{StaticResource BodyLabel}" HorizontalOptions="Center"/>
+                        <Label Text="Difficulty" Style="{StaticResource BodyLabel}" 
+                               HorizontalOptions="Center"/>
                     </StackLayout>
                 </Frame>
 
                 <Frame Grid.Column="2" Style="{StaticResource CardFrame}">
                     <StackLayout HorizontalOptions="Center" Spacing="4">
                         <Label Text="🔥" FontSize="24" HorizontalOptions="Center"/>
-                        <Label Text="{Binding Calories}" 
+                        <Label Text="{Binding Recipe.Calories}" 
                                FontAttributes="Bold" HorizontalOptions="Center"/>
-                        <Label Text="Calories" Style="{StaticResource BodyLabel}" HorizontalOptions="Center"/>
+                        <Label Text="Calories" Style="{StaticResource BodyLabel}" 
+                               HorizontalOptions="Center"/>
                     </StackLayout>
                 </Frame>
             </Grid>
 
             <!-- Description -->
             <Frame Style="{StaticResource CardFrame}">
-                <StackLayout Spacing="8">
+                <StackLayout Spacing="{StaticResource SpacingSmall}">
                     <Label Text="Description" Style="{StaticResource HeadingLabel}"/>
-                    <Label Text="{Binding Description}" Style="{StaticResource BodyLabel}"/>
+                    <Label Text="{Binding Recipe.Description}" Style="{StaticResource BodyLabel}"/>
                 </StackLayout>
             </Frame>
 
             <!-- Ingredients -->
             <Frame Style="{StaticResource CardFrame}">
-                <StackLayout Spacing="8">
+                <StackLayout Spacing="{StaticResource SpacingSmall}">
                     <Label Text="Ingredients" Style="{StaticResource HeadingLabel}"/>
-                    <CollectionView ItemsSource="{Binding Ingredients}">
+                    <CollectionView ItemsSource="{Binding Recipe.Ingredients}">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="x:String">
                                 <StackLayout Orientation="Horizontal" Spacing="8" Padding="0,4">
-                                    <Label Text="•" TextColor="{StaticResource PrimaryColor}" FontSize="14"/>
+                                    <Label Text="•" TextColor="{StaticResource PrimaryColor}" 
+                                           FontSize="{StaticResource BodyFontSize}"/>
                                     <Label Text="{Binding .}" Style="{StaticResource BodyLabel}"/>
                                 </StackLayout>
                             </DataTemplate>
@@ -79,21 +101,25 @@
                 </StackLayout>
             </Frame>
 
-            <!-- Instructions with TTS -->
+            <!-- Instructions with Text-to-Speech -->
             <Frame Style="{StaticResource CardFrame}">
-                <StackLayout Spacing="16">
+                <StackLayout Spacing="{StaticResource SpacingMedium}">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Grid.Column="0" Text="Instructions" Style="{StaticResource HeadingLabel}"/>
+                        <Label Grid.Column="0" Text="Instructions" 
+                               Style="{StaticResource HeadingLabel}"/>
                         <Button Grid.Column="1" 
                                 Text="🔊 Read Aloud"
                                 Style="{StaticResource PrimaryButton}"
-                                Clicked="OnReadAloudClicked"/>
+                                Command="{Binding ReadAloudCommand}"
+                                AutomationProperties.Name="Read recipe aloud"
+                                AutomationProperties.HelpText="Reads the cooking instructions using text-to-speech"/>
                     </Grid>
 
-                    <CollectionView ItemsSource="{Binding Instructions}">
+                    <CollectionView ItemsSource="{Binding Recipe.Instructions}">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="x:String">
-                                <Grid ColumnDefinitions="Auto,*" Padding="0,8" ColumnSpacing="8">
+                                <Grid ColumnDefinitions="Auto,*" Padding="0,8" 
+                                      ColumnSpacing="{StaticResource SpacingSmall}">
                                     <Frame Grid.Column="0" 
                                            BackgroundColor="{StaticResource PrimaryColor}"
                                            CornerRadius="20" WidthRequest="32" HeightRequest="32" 
@@ -110,6 +136,13 @@
                 </StackLayout>
             </Frame>
 
+            <!-- Start Cooking Button -->
+            <Button Text="Start Cooking Mode"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding StartCookingCommand}"
+                    HeightRequest="56"
+                    FontSize="{StaticResource SubheadingFontSize}"
+                    Margin="0,0,0,24"/>
         </StackLayout>
     </ScrollView>
 </ContentPage>
